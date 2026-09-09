@@ -1,21 +1,12 @@
 import OpenAiApi
+import Ui
 
 def main : IO Unit := do
-  let stdin ← IO.getStdin
-  let stdout ← IO.getStdout
   let mut previousResponseId : Option String := none
 
   while true do
-    stdout.putStr "You: "
-    stdout.flush
-
-    let line ← stdin.getLine
-
-    if line.isEmpty then
-      stdout.putStrLn ""
-      break
-
-    let prompt := line.trimAscii.toString
+    let some prompt ← Ui.readPrompt
+      | break
 
     if prompt == "/quit" then
       break
@@ -26,5 +17,6 @@ def main : IO Unit := do
     let response ← OpenAiApi.respond prompt previousResponseId
     let text ← IO.ofExcept response.outputText
 
-    stdout.putStrLn s!"Assistant: {text}\n"
+    Ui.printResponse text
+
     previousResponseId := some response.id

@@ -4,6 +4,9 @@ defaultTargets = ["chat"]
 [[lean_lib]]
 name = "OpenAiApi"
 
+[[lean_lib]]
+name = "Ui"
+
 [[lean_exe]]
 name = "chat"
 root = "Main"
