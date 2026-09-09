@@ -1,0 +1,9 @@
+name = "minimal-ifc-agent-lean"
+defaultTargets = ["chat"]
+
+[[lean_lib]]
+name = "OpenAiApi"
+
+[[lean_exe]]
+name = "chat"
+root = "Main"

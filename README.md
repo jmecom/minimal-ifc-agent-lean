@@ -1,41 +1,24 @@
-# minimal ifc agent
+# minimal-ifc-agent-lean
 
-Minimal agent, inspired by [Gollum](https://github.com/ddz/gollum), but that implements fides-style information flow control.
-For a more complete and useful IFC-capable agent, see my other project, [pi-ifc](https://github.com/jmecom/pi-ifc).
+A minimal Lean 4 chat program. `Main.lean` loops over `You:` prompts, calls the
+OpenAI Responses API through `curl`, and prints each reply as `Assistant:`.
+It passes the previous response ID with each follow-up so the conversation
+keeps its context. Blank lines are skipped; `/quit` or Ctrl-D exits.
 
-- [agent_basic.py](agent_basic.py): file reads and shell output are untrusted and hidden.
-  Its shell has normal host access.
-- [agent_useful_for_coding.py](agent_useful_for_coding.py): approves a project as
-  private/trusted and edits it in place. File tools and shell run through macOS
-  `sandbox-exec`, with workspace/scratch writes, runtime reads, and no network.
+The `OpenAiApi.respond` function in `OpenAiApi.lean` handles the API call and
+returns an `OpenAiApi.Response` with the ID, model, timestamps, status, output
+items, token usage, and error details. Output items remain JSON so message,
+reasoning, and tool-call data are preserved. `Response.outputText` extracts
+text for display; `main` handles console input and output.
 
-Both use [agent_core.py](agent_core.py) for the chat loop, labels, hidden
-variables, and policy checks. [agent_ui.py](agent_ui.py) handles terminal output,
-debug labels, and read approvals. Each agent supplies its tools and policies.
-
-Set up the environment:
-
-```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-Set `OPENAI_API_KEY`; `OPENAI_MODEL` is optional. Run either agent:
+Install [Lean via elan](https://lean-lang.org/install/manual/) and have `curl`
+on your path, then run:
 
 ```sh
-.venv/bin/python agent_basic.py --debug
-.venv/bin/python agent_useful_for_coding.py --workspace . --debug
+source ~/.elan/env
+export OPENAI_API_KEY="your-api-key"
+lake exe chat
 ```
 
-This is a research playground. The coding agent trusts the approved tree and
-host; it does not track another process putting outside content into that tree.
-OpenAI is allowed to receive private data. The sandbox limits access, but does
-not prevent bad edits within the project.
-
-Papers:
-
-- [FIDES: Securing AI Agents with Information-Flow Control](https://arxiv.org/abs/2505.23643)
-- [CaMeL: Defeating Prompt Injections by Design](https://arxiv.org/abs/2503.18813)
-- [Prudentia: Optimizing Agent Planning for Security and Autonomy](https://arxiv.org/abs/2602.11416)
-- [Denning: A Lattice Model of Secure Information Flow (1976)](https://faculty.nps.edu/dedennin/publications/lattice76.pdf)
-- [Design Patterns for Securing LLM Agents against Prompt Injections](https://arxiv.org/abs/2506.08837)
+Set `OPENAI_MODEL` to override the default model, `gpt-5.4-mini`.
+Run `lake build` to compile without making an API request.
