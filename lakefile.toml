@@ -1,5 +1,14 @@
 name = "minimal-ifc-agent-lean"
-defaultTargets = ["chat"]
+defaultTargets = ["chat", "IfcTests"]
+
+[[lean_lib]]
+name = "Ifc"
+
+[[lean_lib]]
+name = "IfcProofs"
+
+[[lean_lib]]
+name = "IfcTests"
 
 [[lean_lib]]
 name = "OpenAiApi"

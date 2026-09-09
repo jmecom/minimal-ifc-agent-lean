@@ -16,6 +16,24 @@ reasoning, and tool-call data are preserved. `Response.outputText` extracts
 text for display. `Ui.lean` handles prompts, colors, and console output;
 `Main.lean` owns the conversation loop.
 
+`Ifc.lean` defines public/private confidentiality, trusted/untrusted integrity,
+and the rules for combining labels. Private data cannot flow to a public label,
+and untrusted data cannot flow to a trusted label.
+
+`Labeled label α` puts the label in the value's type. `map` preserves it;
+`zipWith` combines both inputs' labels. `relabel` requires a proof of
+`FlowsTo source destination`; Lean fills it in for concrete labels. `tryRelabel`
+checks that same rule at runtime, with a proof that it accepts exactly the allowed flows.
+These are label primitives: the chat has not yet been connected to them.
+Constructing a labeled value or accessing its `.value` is trusted code.
+
+`IfcProofs.lean` proves that flow is a partial order (`a ≤ b` means `FlowsTo a b`),
+and that `join` is associative, commutative, and idempotent. Its central theorem,
+`Label.join_flowsTo`, says a combined value may flow to a destination exactly
+when both inputs may flow there. Import `Ifc` for the types and operations, or
+`IfcProofs` to include the theorems and partial-order laws. `IfcTests.lean` checks
+examples using both. These proofs use Lean's standard library.
+
 Install [Lean via elan](https://lean-lang.org/install/manual/) and have `curl`
 on your path, then run:
 
@@ -26,4 +44,5 @@ lake exe chat
 ```
 
 Set `OPENAI_MODEL` to override the default model, `gpt-5.4-mini`.
-Run `lake build` to compile without making an API request.
+Run `lake build` to compile the chat and check the IFC rules and examples
+without making an API request.
